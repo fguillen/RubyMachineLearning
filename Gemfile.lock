@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    classifier-reborn (2.2.0)
+      fast-stemmer (~> 1.0)
+    fast-stemmer (1.0.2)
+
+PLATFORMS
+  x86_64-darwin-18
+  x86_64-darwin-19
+
+DEPENDENCIES
+  classifier-reborn
+
+BUNDLED WITH
+   2.2.16
