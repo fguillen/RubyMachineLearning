@@ -4,6 +4,7 @@ GEM
     classifier-reborn (2.2.0)
       fast-stemmer (~> 1.0)
     fast-stemmer (1.0.2)
+    minitest (5.14.4)
 
 PLATFORMS
   x86_64-darwin-18
@@ -11,6 +12,7 @@ PLATFORMS
 
 DEPENDENCIES
   classifier-reborn
+  minitest
 
 BUNDLED WITH
    2.2.16

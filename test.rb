@@ -1,6 +1,6 @@
 require "classifier-reborn"
 
-classifier = ClassifierReborn::Bayes.new "Interesting", "Uninteresting", "Not clear"
+classifier =    ::Bayes.new "Interesting", "Uninteresting", "Not clear"
 classifier.train "Interesting", "Here are some good words. I hope you love them."
 classifier.train "Uninteresting", "Here are some bad words, I hate you."
 puts classifier.classify "I hate bad words and you." #=> "Uninteresting"
