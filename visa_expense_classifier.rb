@@ -3,10 +3,10 @@ require "classifier-reborn"
 
 require_relative "utils"
 
-class BankExpenseClassifier
+class VisaExpenseClassifier
   def train
-    @data = Utils.load_csv_in_json("#{__dir__}/data/expenses.csv")
-    @samples = BankExpenseClassifier.extract_samples(@data)
+    @data = Utils.load_csv_in_json("#{__dir__}/data/visa_expenses.csv")
+    @samples = VisaExpenseClassifier.extract_samples(@data)
 
 
     @classifier = ClassifierReborn::Bayes.new(enable_stemmer: false, stopwords: [], enable_threshold: true, threshold: -30.0)
@@ -19,14 +19,11 @@ class BankExpenseClassifier
       CSV.generate do |csv|
         # headers
         csv << [
-          "Posting text",
-          "Purpose",
-          "Beneficiary/payer",
-          "Account number",
-          "BankCode",
+          "original currency",
+          "description of transaction",
           "Category",
           "Guessed",
-          "Same",
+          "Same?",
           "Score",
           "Classifications"
         ]
@@ -37,11 +34,8 @@ class BankExpenseClassifier
           classifications = classifications(element)
 
           csv << [
-            element["Posting text"],
-            element["Purpose"],
-            element["Beneficiary/payer"],
-            element["Account number"],
-            element["BankCode"],
+            element["original currency"],
+            element["description of transaction"],
             element["Category"],
             category_guessed,
             category_guessed == ClassifierReborn::CategoryNamer.prepare_name(element["Category"]).to_s,
@@ -51,37 +45,27 @@ class BankExpenseClassifier
         end
       end
 
-    File.write("#{__dir__}/data/#{Time.now}_expenses_result.csv", output_string)
+    File.write("#{__dir__}/data/#{Time.now}_visa_expenses_result.csv", output_string)
   end
 
   def validator
-    samples = BankExpenseClassifier.sample_data_in_array_of_arrays(@samples)
+    samples = VisaExpenseClassifier.sample_data_in_array_of_arrays(@samples)
     ClassifierReborn::ClassifierValidator.cross_validate(@classifier, samples, 5)
   end
 
-  def classify_uncategorized
-    @data.each do |element|
-      if element["Category"].nil?
-        text = BankExpenseClassifier.concatenate_text(element)
-        category = classify(element)
-
-        puts "#{text} -> #{category}"
-      end
-    end
-  end
-
   def classify(element)
-    text = BankExpenseClassifier.concatenate_text(element)
+    text = VisaExpenseClassifier.concatenate_text(element)
+    puts "XXX: text: #{text}"
     @classifier.classify(text)
   end
 
   def classify_with_score(element)
-    text = BankExpenseClassifier.concatenate_text(element)
+    text = VisaExpenseClassifier.concatenate_text(element)
     @classifier.classify_with_score(text)
   end
 
   def classifications(element)
-    text = BankExpenseClassifier.concatenate_text(element)
+    text = VisaExpenseClassifier.concatenate_text(element)
     classifications = @classifier.classifications(text)
     classifications.sort_by { |_k, v| v }.reverse
   end
@@ -103,10 +87,8 @@ class BankExpenseClassifier
 
   def self.concatenate_text(data_element)
     [
-      Utils.remove_numbers(data_element["Purpose"]),
-      data_element["Posting text"],
-      data_element["Beneficiary/payer"],
-      data_element["Account number"]
+      data_element["original currency"],
+      Utils.remove_numbers(data_element["description of transaction"])
     ].map { |e| Utils.slug(e.to_s) }.join(" ").strip
   end
 end
